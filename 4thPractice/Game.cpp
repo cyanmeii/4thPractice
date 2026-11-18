@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <iomanip>
+
 #include "ChickenCoop.h"
 #include "CowShed.h"
 #include "Resource.h"
@@ -50,6 +52,9 @@ void Game::startTurn() {
 	farm_.recalculateMarket();   // 3. пересчёт цен
 
 	cout << "\n==================== Ход " << turn_ << " из " << maxTurns_ << " ====================\n";
+	if (turn_ == 1) {
+		return;      // в самом начале производить ещё нечему
+	}
 	cout << "За ночь на складе: ";
 	for (int k = 0; k < KIND_COUNT; ++k) {
 		int diff = farm_.stock(static_cast<ResourceKind>(k)) - before[k];
@@ -102,12 +107,13 @@ void Game::buyAnimalsMenu() {
 }
 
 void Game::sellMenu() {
-	cout << "Что продать?\n";
+	cout << "Что продать?\n" << std::fixed << std::setprecision(1);
 	for (int k = 0; k < KIND_COUNT; ++k) {
 		ResourceKind kind = static_cast<ResourceKind>(k);
 		cout << "  " << (k + 1) << ". " << resourceTitle(kind) << " (на складе "
 		     << farm_.stock(kind) << ", цена " << farm_.price(kind) << ")\n";
 	}
+	cout.unsetf(std::ios_base::floatfield);
 	cout << "  0. Назад\n";
 	int choice = 0;
 	if (!readInt("Ваш выбор: ", 0, KIND_COUNT, choice) || choice == 0) {

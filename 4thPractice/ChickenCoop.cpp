@@ -11,5 +11,5 @@ void ChickenCoop::processTurn(Warehouse& w) {
 
 void ChickenCoop::print(std::ostream& os) const {
 	os << "Курятник: кур " << animals_ << "/" << CAPACITY
-	   << ", сытых в прошлый раз " << fed_;
+	   << ", накормлено в этом ходу " << fed_ << " из " << animals_;
 }

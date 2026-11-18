@@ -1,6 +1,7 @@
 #include "Market.h"
 
 #include <iomanip>
+#include <string>
 
 #include "Egg.h"
 #include "Grain.h"
@@ -51,12 +52,24 @@ void Market::recalculate() {
 	}
 }
 
+// Дополняет строку пробелами до width СИМВОЛОВ (std::setw считает байты UTF-8,
+// а русская буква занимает 2 байта, из-за чего столбцы "ехали").
+static std::string padRight(const std::string& s, int width) {
+	int chars = 0;
+	for (std::size_t i = 0; i < s.size(); ++i) {
+		if ((static_cast<unsigned char>(s[i]) & 0xC0) != 0x80) {
+			++chars;
+		}
+	}
+	return s + std::string(chars < width ? width - chars : 0, ' ');
+}
+
 void Market::print(std::ostream& os) const {
 	os << "Рынок (цена за единицу):\n";
 	os << std::fixed << std::setprecision(1);
 	for (int k = 0; k < KIND_COUNT; ++k) {
-		os << "  " << std::left << std::setw(7) << resourceTitle(static_cast<ResourceKind>(k))
-		   << std::right << std::setw(6) << price_[k] << " зол."
+		os << "  " << padRight(resourceTitle(static_cast<ResourceKind>(k)), 7)
+		   << std::setw(6) << price_[k] << " зол."
 		   << "  | история: средняя " << priceHistory_[k].average()
 		   << ", мин " << priceHistory_[k].min()
 		   << ", макс " << priceHistory_[k].max()
